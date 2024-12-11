@@ -1,8 +1,7 @@
 #include <iostream>
-#include <vector>
 using namespace std;
-int num;
-int vec[100005];
+int N;
+int stu[35];
 
 template <typename T>
 int Paritition(T A[], int low, int high) {
@@ -30,16 +29,22 @@ void QuickSort(T A[], int len) {
 }
 
 int main(void) {
-    cin >> num;
-    int temp = 0, div = 0, cnt = 0;
-    for (int i = 0; i < num; i++) {
-        cin >> vec[i];
+    cin >> N;
+    for (int i = 0; i < N; i++) {
+        cin >> stu[i];
     }
-    QuickSort(vec, num);
-    div = vec[num / 2];
-    for (int i = 0; i < num; i++) {
-      if (vec[i] >= div) cnt++;
+    QuickSort(stu, N);
+
+    // for (int i = 0; i < N; i++) {
+    //     cout << stu[i] << ' ';
+    // }
+
+    int K = 0;
+    float sum = 0;
+    cin >> K;
+    for (int i = N - 1, j = 0; j < K; i--, j++) {
+        sum += stu[i];
     }
-    cout << div << ' ' << cnt;
+    printf("%.2f", sum / K);
     return 0;
 }
