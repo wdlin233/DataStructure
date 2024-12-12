@@ -23,17 +23,18 @@ int antiNum(string data, int length) {
 
 // compare string's antiNum number to sort
 bool cmp(string a, string b) {
-    return antiNum(a, a.length()) <= antiNum(b, b.length());
+    return antiNum(a, a.length()) < antiNum(b, b.length());
 }
 
 int main(void) {
     cin >> N >> M;
-    string str;
     for (int i = 0; i < M; i++) {
+        string str;
         cin >> str;
         vec.push_back(str);
     }
-    sort(vec.begin(), vec.end(), cmp);
+    // 因为题目要求 逆序对数相同的字符串按照输入顺序输出
+    stable_sort(vec.begin(), vec.end(), cmp);
     for (int i = 0; i < M; i++) {
         cout << vec[i] << endl;
     }
