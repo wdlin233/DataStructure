@@ -20,6 +20,7 @@ private:
     int mean_r; //Rmean
     int mean_g; //Gmean
     int mean_b; //Bmean
+    bool judge_twice;
 public:
     Node();
     Node(PNG* corner, int input_width, int input_height, int x, int y);
@@ -30,6 +31,7 @@ public:
     ~Node();
     void print();
     pxl *get_pxl();
+    void reset_png(Node *node, int mean_r, int mean_g, int mean_b);
 };
 
 
