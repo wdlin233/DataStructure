@@ -32,6 +32,11 @@ public:
     void print();
     pxl *get_pxl();
     void reset_png(Node *node, int mean_r, int mean_g, int mean_b);
+    PNG *get_png();
+    int get_width();
+    int get_height();
+    int *get_mean();
+    Node *&get_child(int i);
 };
 
 
@@ -48,5 +53,6 @@ public:
     pxl *get_pxl();
     void load_png(PNG *png);
     void print();
+    void reset_png(Node *node, int mean_r, int mean_g, int mean_b);
 };
 #endif

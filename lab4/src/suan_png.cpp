@@ -170,3 +170,7 @@ int PNG::get_width() const{
 int PNG::get_height() const{
     return height_;
 }
+
+pxl *PNG::get_image() {
+    return image;
+}

@@ -18,6 +18,7 @@ public:
     pxl *get_pxl(int x, int y);
     int get_width() const;
     int get_height() const;
+    pxl *get_image();
 };
 
 #endif
