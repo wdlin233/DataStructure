@@ -1,11 +1,39 @@
 #include "tree.h"
 
 Node::Node() {
-    //TODO
+    p = nullptr; 
+    children = new Node*[4];
+    for (int i = 0; i < 4; i++) {
+        children[i] = nullptr;
+    } 
+    width = 0; 
+    height = 0; 
+    leaf = false; 
+    x = 0; 
+    y = 0; 
+    mean_r = 0; 
+    mean_g = 0; 
+    mean_b = 0; 
 }
 
 Node::Node(PNG* corner, int input_width, int input_height, int x, int y) {
-    //TODO
+    corner = p;
+    children = new Node*[4];
+    for (int i = 0; i < 4; i++) {
+        children[i] = nullptr;
+    }
+    width = input_width;
+    height = input_height;
+    if (input_width == 1 && input_height == 1) {
+        leaf = true;
+    } else {
+        leaf = false;
+    }
+    x = x;
+    y = y;
+    mean_r = 0;
+    mean_g = 0;
+    mean_b = 0; 
 }
 
 Node::Node(Node &other) {
@@ -30,7 +58,7 @@ void Tree::judge(int threshold) {
 }
 
 void Tree::load_png(PNG *png) {
-    //TODO
+    png->get_pxl
 }
 
 /*

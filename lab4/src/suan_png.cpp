@@ -11,7 +11,7 @@ PNG::~PNG() {
 }
 
 int PNG::load(std::string &file_name) {
-    FILE* fp = fopen(file_name.c_str(), "rb");
+    FILE* fp = fopen(file_name.c_str(), "rb"); // read as binary
     if (!fp) {
         perror("Fopen failed: ");
         return 1;
@@ -75,7 +75,7 @@ int PNG::load(std::string &file_name) {
         png_byte* pix = (png_byte*)row;
         for (size_t x = 0; x < width; x++) {
             pxl& px = new_pixs[width * y + x];
-            if (numchannels == 1 || numchannels == 2) {
+            if (numchannels == 1 || numchannels == 2) { // gary or gray with alpha
                 unsigned char color = (unsigned char)*pix++;
                 px.red = color;
                 px.green = color;
@@ -85,7 +85,7 @@ int PNG::load(std::string &file_name) {
                 } else {
                     px.alpha = 255;
                 }
-            } else if (numchannels == 3 || numchannels == 4) {
+            } else if (numchannels == 3 || numchannels == 4) { // RGB or RGBA
                 px.red = (unsigned char)*pix++;
                 px.green = (unsigned char)*pix++;
                 px.blue = (unsigned char)*pix++;
@@ -98,9 +98,9 @@ int PNG::load(std::string &file_name) {
         }
     }
     delete[] image;
-    image = new_pixs;
-    width_ = width;
-    height_ = height;
+    this->image = new_pixs;
+    this->width_ = width;
+    this->height_ = height;
     delete[] row;
     png_read_end(png_ptr, nullptr);
     png_destroy_read_struct(&png_ptr, &info_ptr, nullptr);
