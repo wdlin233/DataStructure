@@ -36,6 +36,7 @@ public:
 class Tree {
 private:
     Node *root; //根结点
+    Node *load_png_node(PNG *png, int width, int height, int x, int y); 
 public:
     Tree();
     ~Tree();
