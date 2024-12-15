@@ -18,7 +18,7 @@ Node::Node() {
 }
 
 Node::Node(PNG* corner, int input_width, int input_height, int x, int y) {
-    corner = p;
+    p = corner;
     children = new Node*[4];
     for (int i = 0; i < 4; i++) {
         children[i] = nullptr;
@@ -163,7 +163,28 @@ void Tree::judge(int threshold) {
 }
 
 void Tree::load_png(PNG *png) {
-    png->get_pxl
+    root = load_png_node(png, png->get_width(), png->get_height(), 0, 0);
+    //int size = png->get_width() * png->get_height();
+    int tile_width = png->get_width() / 4;
+    int tile_height = png->get_height() / 4; 
+    pxl *image = new pxl[png->get_width() * png->get_height()];
+    for (int i = 0; i < png->get_width(); i++) {
+        for (int j = 0; j < png->get_height(); j++) {
+            image[png->get_width() * j + i] = *(png->get_pxl(i, j));
+        }
+    }
+    for (int j = 0; j < 4; j++) {
+        root->children[j] = load_png_node(png, png->get_width() / 2, png->get_height() / 2, tile_width * j, tile_height * j);
+    }
+
+}
+
+Node *Tree::load_png_node(PNG *png, int width, int height, int x, int y) {
+    if (width == 1 && height == 1) {
+        return new Node(png, 1, 1, x, y);
+    } else {
+        return new Node(png, width, height, x, y);
+    }
 }
 
 /*
