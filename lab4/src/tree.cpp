@@ -1,264 +1,324 @@
 #include "tree.h"
+#include <queue>
 
 Node::Node() {
-    p = nullptr; 
+    p=NULL;
     children = new Node*[4];
-    for (int i = 0; i < 4; i++) {
-        children[i] = nullptr;
-    } 
-    width = 0; 
-    height = 0; 
-    leaf = false; 
-    x = 0; 
-    y = 0; 
-    mean_r = 0; 
-    mean_g = 0; 
-    mean_b = 0;
-    judge_twice = false; 
+    for(int i=0;i<4;i++)
+    {
+        *(children+i)=NULL;
+    }
+    width=0;
+    height=0;
+    leaf=false;
+    x=0;
+    y=0;
+    mean_b=0;
+    mean_g=0;
+    mean_r=0;
+    cut=0;
+
 }
 
 Node::Node(PNG* corner, int input_width, int input_height, int x, int y) {
-    p = corner;
+    p=corner;
     children = new Node*[4];
-    for (int i = 0; i < 4; i++) {
-        children[i] = nullptr;
-    }
-    width = input_width;
-    height = input_height;
-    if (input_width == 1 && input_height == 1) {
-        leaf = true;
-    } else {
-        leaf = false;
-    }
-    x = x;
-    y = y;
-    mean_r = 0;
-    mean_g = 0;
-    mean_b = 0;
-    judge_twice = false; 
+    for(int i=0;i<4;i++)
+    {
+        *(children+i)=NULL;
+    }   
+    width=input_width;
+    height=input_height;
+    if(input_width==1 && input_height==1)
+        leaf=true;
+    else
+        leaf=false;
+    this->x=x;
+    this->y=y;
+    mean_r=get_pxl()->red;
+    mean_g=get_pxl()->green;
+    mean_b=get_pxl()->blue;
+    r_r=mean_r;
+    r_g=mean_g;
+    r_b=mean_b;
+    cut=0;
+
 }
 
 Node::Node(Node &other) {
-    // copy constructor implementation
-    // this->p = other.p ? new SomeType(*other.p) : nullptr; // Deep copy if p is not null
-    // if (other.children) {
-    //     this->children = new SomeType(*other.children); // Deep copy if children is not null
-    // } else {
-    //     this->children = nullptr;
-    // }
-    this->p = new PNG();
-    *(this->p)=*(other.p);
-    this->children = new Node*[4];
+    p=new PNG();
+    *p=*(other.p);
+    children = new Node*[4];
     for(int i=0;i<4;i++)
     {
-        *(this->children+i)=other.children[i];
+        *(children+i)=other.children[i];
     }
-    this->width = other.width;
-    this->height = other.height;
-    this->leaf = other.leaf;
-    this->x = other.x;
-    this->y = other.y;
-    this->mean_r = other.mean_r;
-    this->mean_g = other.mean_g;
-    this->mean_b = other.mean_b;
-    this->judge_twice = other.judge_twice;
+    width=other.width;
+    height=other.height;
+    leaf=other.leaf;
+    this->x=other.x;
+    this->y=other.y;
+    mean_r=other.mean_r;
+    mean_g=other.mean_g;
+    mean_b=other.mean_b;
+    r_r=mean_r;
+    r_g=mean_g;
+    r_b=mean_b;
+    cut=other.cut;
+
 }
 
 Node::Node(Node &&other) {
-    // Move constructor implementation
-    this->p = other.p;
-    this->children = other.children;
-    this->width = other.width;
-    this->height = other.height;
-    this->leaf = other.leaf;
-    this->x = other.x;
-    this->y = other.y;
-    this->mean_r = other.mean_r;
-    this->mean_g = other.mean_g;
-    this->mean_b = other.mean_b;
-    this->judge_twice = other.judge_twice;
-    other.p = nullptr;
-    other.children = nullptr;
+    p=other.p;
+    children=other.children;
+    width=other.width;
+    height=other.height;
+    leaf=other.leaf;
+    this->x=other.x;
+    this->y=other.y;
+    mean_r=other.mean_r;
+    mean_g=other.mean_g;
+    mean_b=other.mean_b;
+    r_r=mean_r;
+    r_g=mean_g;
+    r_b=mean_b;
+    cut=other.cut;
+    other.p=nullptr;
+    other.children=nullptr;
 }
 
 Node& Node::operator=(Node &other) {
-    // copy assignment implementation
-    if (this != &other) {
-        delete this->p;
-        delete this->children;
-        // this->p = other.p ? new SomeType(*other.p) : nullptr; // Deep copy if p is not null
-        // if (other.children) {
-        //     this->children = new SomeType(*other.children); // Deep copy if children is not null
-        // } else {
-        //     this->children = nullptr;
-        // }
-        this->p = new PNG();
-        *(this->p)=*(other.p);
-        this->children = new Node*[4];
-        for(int i=0;i<4;i++)
-        {
-            *(this->children+i)=other.children[i];
-        }
-        this->width = other.width;
-        this->height = other.height;
-        this->leaf = other.leaf;
-        this->x = other.x;
-        this->y = other.y;
-        this->mean_r = other.mean_r;
-        this->mean_g = other.mean_g;
-        this->mean_b = other.mean_b;
-        this->judge_twice = other.judge_twice;
+    if(this==&other)return *this;
+    p=other.p;
+    children = new Node*[4];
+    for(int i=0;i<4;i++)
+    {
+        *(children+i)=other.children[i];
     }
+    width=other.width;
+    height=other.height;
+    leaf=other.leaf;
+    this->x=other.x;
+    this->y=other.y;
+    mean_r=other.mean_r;
+    mean_g=other.mean_g;
+    mean_b=other.mean_b;
+    r_r=mean_r;
+    r_g=mean_g;
+    r_b=mean_b;
+    cut=other.cut;
     return *this;
 }
 
 Node& Node::operator=(Node &&other) {
-    // Move assignment implementation
-    if (this != &other) {
-        delete this->p;
-        delete this->children;
-        this->p = other.p;
-        this->children = other.children;
-        this->width = other.width;
-        this->height = other.height;
-        this->leaf = other.leaf;
-        this->x = other.x;
-        this->y = other.y;
-        this->mean_r = other.mean_r;
-        this->mean_g = other.mean_g;
-        this->mean_b = other.mean_b;
-        this->judge_twice = other.judge_twice;
-        other.p = nullptr;
-        other.children = nullptr;
-    }
+    if(this==&other)return *this;
+    if(p!=NULL) delete p;
+    if(children!=NULL) delete[] p;
+    p=other.p;
+    children=other.children;
+    width=other.width;
+    height=other.height;
+    leaf=other.leaf;
+    this->x=other.x;
+    this->y=other.y;
+    mean_r=other.mean_r;
+    mean_g=other.mean_g;
+    mean_b=other.mean_b;
+    r_r=mean_r;
+    r_g=mean_g;
+    r_b=mean_b;
+    cut=other.cut;
+    other.p=nullptr;
+    other.children=nullptr;
     return *this;
-}
 
-void Node::reset_png(Node *node, int mean_r, int mean_g, int mean_b) {
-    if (node->leaf) {
-        pxl *pxls = node->p->get_image();
-        pxls->red = mean_r;
-        pxls->green = mean_g;
-        pxls->blue = mean_b;
-        return;
-    }
-    if (judge_twice == false) {
-        judge_twice = true;
-        for (int i = 0; i < 4; i++) {
-            reset_png(node->children[i], mean_r, mean_g, mean_b);
-        }
-    }
+}
+int Node::get_heigth(){
+    return height;
+}
+int Node::get_width(){
+    return width;
+}
+int Node::get_x(){
+    return x;
+}
+int Node::get_y(){
+    return y;
+}
+bool Node::Orleaf(){
+    return leaf;
+}
+void Node::Set_rgb(int r,int g,int b){
+    mean_r=r;
+    mean_g=g;
+    mean_b=b;
     return;
-}
-
-Node *&Node::get_child(int i) {
-    return children[i];
-}
-
-void Node::set_pxl(int r, int g, int b) {
-    mean_r = r;
-    mean_g = g;
-    mean_b = b;
 }
 
 void Tree::judge(int threshold) {
-    pxl *pxls = this->root->get_png()->get_image();
-    int size = this->root->get_width() * this->root->get_height();
-    int sum_r = 0, sum_g = 0, sum_b = 0;
-    for (int i = 0; i < size; i++) {
-        sum_r += pxls[i].red;
-        sum_g += pxls[i].green;
-        sum_b += pxls[i].blue;
-    }
-    this->root->get_mean()[0] = sum_r / size;
-    this->root->get_mean()[1] = sum_g / size;
-    this->root->get_mean()[2] = sum_b / size;
-    int r_bias = 0, g_bias = 0, b_bias = 0;
-    for (int i = 0; i < size; i++) {
-        r_bias += (pxls[i].red - this->root->get_mean()[0]) * (pxls[i].red - this->root->get_mean()[0]);
-        g_bias += (pxls[i].green - this->root->get_mean()[1]) * (pxls[i].green - this->root->get_mean()[1]);
-        b_bias += (pxls[i].blue - this->root->get_mean()[2]) * (pxls[i].blue - this->root->get_mean()[2]);
-    }
-    int var = (r_bias + g_bias + b_bias) / (size * 30);
-    if (var < threshold) {
-        reset_png(this->root, this->root->get_mean()[0], this->root->get_mean()[1], this->root->get_mean()[2]);
-    }
+    if(this->root==NULL)return;
+    pre_judege(root,threshold);
+    restore(root);
+    cal_aver(root);
+
     return;
 }
-
-void create_children(Node* node, PNG* png) {
-    int width[4], height[4], x[4], y[4];
-    width[0] = width[2] = node->get_width() / 2;
-    width[1] = width[3] = node->get_width() - width[0];
-    height[0] = height[1] = node->get_height() / 2;
-    height[2] = height[3] = node->get_height() - height[0];
-    x[0] = x[2] = node->get_x();
-    x[1] = x[3] = node->get_x() + width[0];
-    y[0] = y[1] = node->get_y();
-    y[2] = y[3] = node->get_y() + height[0];
-
-    for (int i = 0; i < 4; i++) {
-        if (width[i] == 0 || height[i] == 0) continue;
-        node->get_child(i) = new Node(png, width[i], height[i], x[i], y[i]);
-        if (width[i] > 1 && height[i] > 1) {
-            create_children(node->get_child(i), png);
-        }
-    }
-}
-
-int Node::get_color(int index) {
-    if (index == 0)
-        return mean_r;
-    else if (index == 1)
-        return mean_g;
-    else
-        return mean_b;
-
-}
-
-void load_png_pxl(Node *node) {
-    if (node->is_leaf()) return;
-    int vaild=0,sum_r=0,sum_g=0,sum_b=0;
-    for(int i=0;i<4;i++)
-    {
-        if(node->get_child(i)!=NULL)
-        {
+void Tree::pre_judege(Node *node, int threshold){
+    int vaild=0;
+    if(node->Orleaf())return;
+    for(int i=0;i<4;i++){
+        if(node->children[i]!=NULL){
+            pre_judege(node->children[i],threshold);
             vaild++;
-            load_png_pxl(node->get_child(i));
-            sum_r+=node->get_child(i)->get_color(0);
-            sum_g+=node->get_child(i)->get_color(1);
-            sum_b+=node->get_child(i)->get_color(2);
         }
     }
-    node->set_pxl(sum_r/vaild,sum_g/vaild,sum_b/vaild);
+    node->cut=max_cut(node);
+    if(node->cut>2)return;
+
+    //
+    int sum_r=0,sum_g=0,sum_b=0;
+    for(int i=0;i<4;i++){
+        if(node->children[i]!=NULL)
+        {
+            sum_r+=node->children[i]->mean_r;
+            sum_g+=node->children[i]->mean_g;
+            sum_b+=node->children[i]->mean_b;
+        }
+    }
+    //
+    int mean_r=0,mean_g=0,mean_b=0;
+    node->mean_r=mean_r=sum_r/vaild;
+    node->mean_g=mean_g=sum_g/vaild;
+    node->mean_b=mean_b=sum_b/vaild;
+    //
+    int var_sum=0,var;
+    for(int i=0;i<4;i++){
+        if(node->children[i]!=NULL){
+            Node *child=node->children[i];
+            var_sum+=(child->mean_r-mean_r)*(child->mean_r-mean_r)+(child->mean_g-mean_g)*(child->mean_g-mean_g)+(child->mean_b-mean_b)*(child->mean_b-mean_b);
+        }
+    }
+    var=var_sum/(30*vaild);
+    if(var<threshold){
+        set_mean(node,mean_r,mean_g,mean_b);
+    }
+        
+}
+int Tree::set_mean(Node *node, int r, int g, int b){
+    if(node==NULL)return -1;
+    node->Set_rgb(r,g,b);
+    if(node->Orleaf()){
+        node->cut++;
+        node->get_pxl()->red=node->mean_r;
+        node->get_pxl()->green=node->mean_g;
+        node->get_pxl()->blue=node->mean_b;
+        return 0;
+    }
+    for(int i=0;i<4;i++){
+        if(node->children[i]!=NULL){
+            set_mean(node->children[i],r,g,b);
+            node->cut=(node->cut)>(node->children[i]->cut)?(node->cut):(node->children[i]->cut);
+
+        }
+    }
+    return 1;
+}
+int Tree::Set_all(Node *node){
+    if(node==NULL)return -1;
+    if(node->Orleaf()){
+        node->get_pxl()->red=node->mean_r;
+        node->get_pxl()->green=node->mean_g;
+        node->get_pxl()->blue=node->mean_b;
+        return 0;
+    }
+    for(int i=0;i<4;i++){
+        if(node->children[i]!=NULL){
+            Set_all(node->children[i]);
+        }
+    }
+    return 1;
+}
+int Tree::restore(Node *node){
+    if(node==NULL)return -1;
+    if(node->Orleaf()){
+        node->mean_r=node->r_r;
+        node->mean_g=node->r_g;
+        node->mean_b=node->r_b;
+        return 0;
+    }
+    for(int i=0;i<4;i++){
+        if(node->children[i]!=NULL){
+            restore(node->children[i]);
+        }
+    }
+    return 1;
+}
+
+
+int Tree::max_cut(Node *node){
+    if(node->Orleaf())return node->cut;
+    int ans=0;
+    for(int i=0;i<4;i++){
+        if(node->children[i]!=NULL){
+            ans=ans>max_cut(node->children[i])?ans:max_cut(node->children[i]);
+        }
+    }
+    return ans;
 }
 
 void Tree::load_png(PNG *png) {
-    Node *tmp = load_png_node(png, png->get_width(), png->get_height(), 0, 0);
-    root = tmp;
-    //int size = png->get_width() * png->get_height();
-    //int tile_width = png->get_width() / 2;
-    //int tile_height = png->get_height() / 2; 
-    // for (int j = 0; j < 4; j++) {
-    //     root->get_child(j) = load_png_node(png, png->get_width() / 2, png->get_height() / 2, tile_width * j, tile_height * j);
-    // }
-    create_children(root, png);
-    
-}
+    Node *tmp=new Node(png,png->get_width(),png->get_height(),0,0);
+    root=tmp;
+    std::queue<Node*> q;
+    q.push(root);
+    while(!q.empty())
+    {
+        Node *b=q.front();
+        q.pop();
+        int w[4],h[4],x[4],y[4];
+        w[0]=w[2]=b->get_width()/2;
+        w[1]=w[3]=b->get_width()-w[0];
+        h[0]=h[1]=b->get_heigth()/2;
+        h[2]=h[3]=b->get_heigth()-h[0];
+        x[0]=x[2]=b->get_x();
+        x[1]=x[3]=b->get_x()+w[0];
+        y[0]=y[1]=b->get_y();
+        y[2]=y[3]=b->get_y()+h[0];
 
-
-
-Node *Tree::load_png_node(PNG *png, int width, int height, int x, int y) {
-    if (width == 1 && height == 1) {
-        return new Node(png, 1, 1, x, y);
-    } else {
-        return new Node(png, width, height, x, y);
+        for(int i=0;i<4;i++)
+        {
+            if(w[i]==1 && h[i]==1)
+                b->children[i]=new Node(png,w[i],h[i],x[i],y[i]);
+            else if (w[i]==0 || h[i]==0)
+                continue;
+            else
+            {
+                b->children[i]=new Node(png,w[i],h[i],x[i],y[i]);
+                q.push(b->children[i]);
+            }
+            
+        }
     }
-}
+    cal_aver(root);
+    
 
-void Tree::reset_png(Node *node, int mean_r, int mean_g, int mean_b) {
-    node->reset_png(node, mean_r, mean_g, mean_b);
-    return;
+
+}
+void Tree::cal_aver(Node *node){
+    if(node->Orleaf())return;
+    int vaild=0,sum_r=0,sum_g=0,sum_b=0;
+    for(int i=0;i<4;i++)
+    {
+        if(node->children[i]!=NULL)
+        {
+            vaild++;
+            cal_aver(node->children[i]);
+            sum_r+=node->children[i]->mean_r;
+            sum_g+=node->children[i]->mean_g;
+            sum_b+=node->children[i]->mean_b;
+        }
+    }
+    node->Set_rgb(sum_r/vaild,sum_g/vaild,sum_b/vaild);
 }
 
 /*
@@ -327,36 +387,4 @@ pxl *Tree::get_pxl() {
 
 void Tree::print() {
     root->print();
-}
-
-PNG *Node::get_png() {
-    return p;
-}
-
-int Node::get_width() {
-    return width;
-}
-
-int Node::get_height() {
-    return height;
-}
-
-int *Node::get_mean() {
-    int *mean = new int[3];
-    mean[0] = mean_r;
-    mean[1] = mean_g;
-    mean[2] = mean_b;
-    return mean;
-}
-
-int Node::get_x() {
-    return x;
-}
-
-int Node::get_y() {
-    return y;
-}
-
-bool Node::is_leaf() {
-    return leaf;
 }
