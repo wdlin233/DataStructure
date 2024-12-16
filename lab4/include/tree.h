@@ -27,11 +27,13 @@ public:
     int r_g;
     int r_b;
     int cut;
+    Node get_child(int index);
     int get_width();
     int get_heigth();
     int get_x();
     int get_y();
     bool is_leaf();
+    int get_rgb(int index);
     void set_rgb(int r,int g,int b);
     Node();
     Node(PNG* corner, int input_width, int input_height, int x, int y);
@@ -57,7 +59,8 @@ public:
     void judge(int threshold);
     pxl *get_pxl();
     void load_png(PNG *png);
-    void cal_aver(Node *node);
+    void set_node_color(Node *node);
+    void build_tree(Node *node, PNG *png);
     void print();
     void pre_judege(Node *node, int threshold);
     int max_cut(Node *node);
