@@ -145,10 +145,10 @@ int Node::get_x(){
 int Node::get_y(){
     return y;
 }
-bool Node::Orleaf(){
+bool Node::is_leaf(){
     return leaf;
 }
-void Node::Set_rgb(int r,int g,int b){
+void Node::set_rgb(int r,int g,int b){
     mean_r=r;
     mean_g=g;
     mean_b=b;
