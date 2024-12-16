@@ -11,7 +11,7 @@
 class Node {
 private:
     PNG *p; //the upper left pixel
-    Node **children; //pointer to four other node
+   
     int width; //当前像素区块的宽度
     int height; //当前像素区块的高度
     bool leaf; //是否是叶子节点，true 代表是叶子节点
@@ -23,6 +23,7 @@ private:
     int mean_alpha;
     
 public:
+ Node **children; //pointer to four other node
     int r_r;
     int r_g;
     int r_b;
@@ -33,7 +34,7 @@ public:
     int get_x();
     int get_y();
     bool is_leaf();
-    int get_rgb(int index);
+    int& get_rgb(int index);
     void set_rgb(int r,int g,int b);
     Node();
     Node(PNG* corner, int input_width, int input_height, int x, int y);
