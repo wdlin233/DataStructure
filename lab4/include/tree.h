@@ -61,7 +61,7 @@ public:
     void set_node_average_color(Node *node);
     void build_tree(Node *node, PNG *png);
     void print();
-    void pre_judege(Node *node, int threshold);
+    void pre_judge(Node *node, int threshold);
     int max_judged_times(Node *node);
     int set_mean(Node *node, int r, int g, int b);
     int restore(Node *node);

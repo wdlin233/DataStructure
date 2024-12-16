@@ -152,18 +152,18 @@ void Node::set_rgb(int r,int g,int b){
 
 void Tree::judge(int threshold) {
     if(this->root==NULL)return;
-    pre_judege(root,threshold);
+    pre_judge(root,threshold);
     restore(root);
     set_node_average_color(root);
 
     return;
 }
-void Tree::pre_judege(Node *node, int threshold){
+void Tree::pre_judge(Node *node, int threshold){
     int vaild=0;
     if(node->is_leaf()) return;
     for(int i=0;i<4;i++){
         if(node->get_child(i)!=NULL){
-            pre_judege(node->get_child(i),threshold);
+            pre_judge(node->get_child(i),threshold);
             vaild++;
         }
     }
