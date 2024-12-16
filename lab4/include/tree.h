@@ -26,7 +26,7 @@ public:
     int r_r;
     int r_g;
     int r_b;
-    int cut;
+    int judged_times;
     Node*& get_child(int index);
     int get_width();
     int get_heigth();
@@ -37,9 +37,9 @@ public:
     void set_rgb(int r,int g,int b);
     Node();
     Node(PNG* corner, int input_width, int input_height, int x, int y);
-    Node(Node &other);
+    Node(const Node &other);
     Node(Node &&other);
-    Node& operator=(Node &other);
+    Node& operator=(const Node &other);
     Node& operator=(Node &&other);
     ~Node();
     void print();
@@ -57,15 +57,13 @@ public:
     Tree(Tree &other);
     Tree& operator=(Tree &other);
     void judge(int threshold);
-    pxl *get_pxl();
     void load_png(PNG *png);
-    void set_node_color(Node *node);
+    void set_node_average_color(Node *node);
     void build_tree(Node *node, PNG *png);
     void print();
     void pre_judege(Node *node, int threshold);
-    int max_cut(Node *node);
+    int max_judged_times(Node *node);
     int set_mean(Node *node, int r, int g, int b);
-    int Set_all(Node *node);
     int restore(Node *node);
 };
 #endif

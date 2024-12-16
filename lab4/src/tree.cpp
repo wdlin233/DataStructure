@@ -16,7 +16,7 @@ Node::Node() {
     mean_b=0;
     mean_g=0;
     mean_r=0;
-    cut=0;
+    judged_times=0;
 
 }
 
@@ -41,31 +41,24 @@ Node::Node(PNG* corner, int input_width, int input_height, int x, int y) {
     r_r=mean_r;
     r_g=mean_g;
     r_b=mean_b;
-    cut=0;
+    judged_times=0;
 
 }
 
-Node::Node(Node &other) {
-    p=new PNG();
-    *p=*(other.p);
+Node::Node(const Node &other) {
+    p = new PNG(*other.p); // Deep copy of PNG object
     children = new Node*[4];
-    for(int i=0;i<4;i++)
-    {
-        *(children+i)=other.children[i];
+    for (int i = 0; i < 4; ++i) {
+        children[i] = other.children[i] ? new Node(*other.children[i]) : nullptr; // Deep copy of children
     }
-    width=other.width;
-    height=other.height;
-    leaf=other.leaf;
-    this->x=other.x;
-    this->y=other.y;
-    mean_r=other.mean_r;
-    mean_g=other.mean_g;
-    mean_b=other.mean_b;
-    r_r=mean_r;
-    r_g=mean_g;
-    r_b=mean_b;
-    cut=other.cut;
-
+    width = other.width;
+    height = other.height;
+    leaf = other.leaf;
+    x = other.x;
+    y = other.y;
+    mean_r = other.mean_r;
+    mean_g = other.mean_g;
+    mean_b = other.mean_b;
 }
 
 Node::Node(Node &&other) {
@@ -82,31 +75,33 @@ Node::Node(Node &&other) {
     r_r=mean_r;
     r_g=mean_g;
     r_b=mean_b;
-    cut=other.cut;
+    judged_times=other.judged_times;
     other.p=nullptr;
     other.children=nullptr;
 }
 
-Node& Node::operator=(Node &other) {
-    if(this==&other)return *this;
-    p=other.p;
-    children = new Node*[4];
-    for(int i=0;i<4;i++)
-    {
-        *(children+i)=other.children[i];
+Node& Node::operator=(const Node &other) {
+    if (this != &other) {
+        delete p;
+        for (int i = 0; i < 4; ++i) {
+            delete children[i];
+        }
+        delete[] children;
+
+        p = new PNG(*other.p); // Deep copy of PNG object
+        children = new Node*[4];
+        for (int i = 0; i < 4; ++i) {
+            children[i] = other.children[i] ? new Node(*other.children[i]) : nullptr; // Deep copy of children
+        }
+        width = other.width;
+        height = other.height;
+        leaf = other.leaf;
+        x = other.x;
+        y = other.y;
+        mean_r = other.mean_r;
+        mean_g = other.mean_g;
+        mean_b = other.mean_b;
     }
-    width=other.width;
-    height=other.height;
-    leaf=other.leaf;
-    this->x=other.x;
-    this->y=other.y;
-    mean_r=other.mean_r;
-    mean_g=other.mean_g;
-    mean_b=other.mean_b;
-    r_r=mean_r;
-    r_g=mean_g;
-    r_b=mean_b;
-    cut=other.cut;
     return *this;
 }
 
@@ -127,7 +122,7 @@ Node& Node::operator=(Node &&other) {
     r_r=mean_r;
     r_g=mean_g;
     r_b=mean_b;
-    cut=other.cut;
+    judged_times=other.judged_times;
     other.p=nullptr;
     other.children=nullptr;
     return *this;
@@ -159,23 +154,23 @@ void Tree::judge(int threshold) {
     if(this->root==NULL)return;
     pre_judege(root,threshold);
     restore(root);
-    set_node_color(root);
+    set_node_average_color(root);
 
     return;
 }
 void Tree::pre_judege(Node *node, int threshold){
     int vaild=0;
-    if(node->is_leaf())return;
+    if(node->is_leaf()) return;
     for(int i=0;i<4;i++){
         if(node->get_child(i)!=NULL){
             pre_judege(node->get_child(i),threshold);
             vaild++;
         }
     }
-    node->cut=max_cut(node);
-    if(node->cut>2)return;
+    node->judged_times=max_judged_times(node);
+    if(node->judged_times>2)return;
 
-    //
+    // calculate mean value
     int sum_r=0,sum_g=0,sum_b=0;
     for(int i=0;i<4;i++){
         if(node->get_child(i)!=NULL)
@@ -190,7 +185,7 @@ void Tree::pre_judege(Node *node, int threshold){
     node->get_rgb(0)=mean_r=sum_r/vaild;
     node->get_rgb(1)=mean_g=sum_g/vaild;
     node->get_rgb(2)=mean_b=sum_b/vaild;
-    //
+    // D(X)
     int var_sum=0,var;
     for(int i=0;i<4;i++){
         if(node->get_child(i)!=NULL){
@@ -199,45 +194,32 @@ void Tree::pre_judege(Node *node, int threshold){
         }
     }
     var=var_sum/(30*vaild);
+    // threshold
     if(var<threshold){
         set_mean(node,mean_r,mean_g,mean_b);
     }
         
 }
 int Tree::set_mean(Node *node, int r, int g, int b){
-    if(node==NULL)return -1;
+    if(node==NULL) return -1;
     node->set_rgb(r,g,b);
     if(node->is_leaf()){
-        node->cut++;
-        node->get_pxl()->red=node->get_rgb(0);
-        node->get_pxl()->green=node->get_rgb(1);
-        node->get_pxl()->blue=node->get_rgb(2);
+        node->judged_times++;
+        node->get_pxl()->red = node->get_rgb(0);
+        node->get_pxl()->green = node->get_rgb(1);
+        node->get_pxl()->blue = node->get_rgb(2);
         return 0;
     }
     for(int i=0;i<4;i++){
         if(node->get_child(i)!=NULL){
             set_mean(node->get_child(i),r,g,b);
-            node->cut=(node->cut)>(node->get_child(i)->cut)?(node->cut):(node->get_child(i)->cut);
+            node->judged_times=(node->judged_times)>(node->get_child(i)->judged_times)?(node->judged_times):(node->get_child(i)->judged_times);
 
         }
     }
     return 1;
 }
-int Tree::Set_all(Node *node){
-    if(node==NULL)return -1;
-    if(node->is_leaf()){
-        node->get_pxl()->red=node->get_rgb(0);
-        node->get_pxl()->green=node->get_rgb(1);
-        node->get_pxl()->blue=node->get_rgb(2);
-        return 0;
-    }
-    for(int i=0;i<4;i++){
-        if(node->get_child(i)!=NULL){
-            Set_all(node->get_child(i));
-        }
-    }
-    return 1;
-}
+
 int Tree::restore(Node *node){
     if(node==NULL)return -1;
     if(node->is_leaf()){
@@ -255,12 +237,12 @@ int Tree::restore(Node *node){
 }
 
 
-int Tree::max_cut(Node *node){
-    if(node->is_leaf())return node->cut;
+int Tree::max_judged_times(Node *node){
+    if(node->is_leaf())return node->judged_times;
     int ans=0;
     for(int i=0;i<4;i++){
         if(node->get_child(i)!=NULL){
-            ans=ans>max_cut(node->get_child(i))?ans:max_cut(node->get_child(i));
+            ans=ans>max_judged_times(node->get_child(i))?ans:max_judged_times(node->get_child(i));
         }
     }
     return ans;
@@ -301,10 +283,10 @@ void Tree::load_png(PNG *png) {
     Node *tmp=new Node(png,png->get_width(),png->get_height(),0,0);
     root=tmp;
     build_tree(root, png);
-    set_node_color(root);
+    set_node_average_color(root);
 }
 
-void Tree::set_node_color(Node *node){
+void Tree::set_node_average_color(Node *node){
     if(node->is_leaf())return;
     int vaild=0,sum_r=0,sum_g=0,sum_b=0;
     for(int i=0;i<4;i++)
@@ -312,7 +294,7 @@ void Tree::set_node_color(Node *node){
         if(node->get_child(i)!=NULL)
         {
             vaild++;
-            set_node_color(node->get_child(i));
+            set_node_average_color(node->get_child(i));
             sum_r+=node->get_child(i)->get_rgb(0);
             sum_g+=node->get_child(i)->get_rgb(1);
             sum_b+=node->get_child(i)->get_rgb(2);
@@ -343,12 +325,11 @@ Node*& Node::get_child(int index) {
  */
 
 Node::~Node() {
-    for (int i = 0; i < 4; i++) {
-        if (children[i]!=NULL) {
-            delete children[i];
-        }
+    delete p; // Delete the PNG object
+    for (int i = 0; i < 4; ++i) {
+        delete children[i]; // Delete each child node
     }
-    delete[] children;
+    delete[] children; // Delete the array of child pointers
 }
 
 void Node::print() {
@@ -393,10 +374,6 @@ Tree& Tree::operator=(Tree &other) {
         root = new Node(*(other.root));
     }
     return *this;
-}
-
-pxl *Tree::get_pxl() {
-    return root->get_pxl();
 }
 
 void Tree::print() {
