@@ -155,6 +155,12 @@ Node *&Node::get_child(int i) {
     return children[i];
 }
 
+void Node::set_pxl(int r, int g, int b) {
+    mean_r = r;
+    mean_g = g;
+    mean_b = b;
+}
+
 void Tree::judge(int threshold) {
     pxl *pxls = this->root->get_png()->get_image();
     int size = this->root->get_width() * this->root->get_height();
@@ -180,22 +186,67 @@ void Tree::judge(int threshold) {
     return;
 }
 
-void Tree::load_png(PNG *png) {
-    root = load_png_node(png, png->get_width(), png->get_height(), 0, 0);
-    //int size = png->get_width() * png->get_height();
-    int tile_width = png->get_width() / 4;
-    int tile_height = png->get_height() / 4; 
-    pxl *image = new pxl[png->get_width() * png->get_height()];
-    for (int i = 0; i < png->get_width(); i++) {
-        for (int j = 0; j < png->get_height(); j++) {
-            image[png->get_width() * j + i] = *(png->get_pxl(i, j));
+void create_children(Node* node, PNG* png) {
+    int width[4], height[4], x[4], y[4];
+    width[0] = width[2] = node->get_width() / 2;
+    width[1] = width[3] = node->get_width() - width[0];
+    height[0] = height[1] = node->get_height() / 2;
+    height[2] = height[3] = node->get_height() - height[0];
+    x[0] = x[2] = node->get_x();
+    x[1] = x[3] = node->get_x() + width[0];
+    y[0] = y[1] = node->get_y();
+    y[2] = y[3] = node->get_y() + height[0];
+
+    for (int i = 0; i < 4; i++) {
+        if (width[i] == 0 || height[i] == 0) continue;
+        node->get_child(i) = new Node(png, width[i], height[i], x[i], y[i]);
+        if (width[i] > 1 && height[i] > 1) {
+            create_children(node->get_child(i), png);
         }
     }
-    for (int j = 0; j < 4; j++) {
-        root->get_child(j) = load_png_node(png, png->get_width() / 2, png->get_height() / 2, tile_width * j, tile_height * j);
-    }
+}
+
+int Node::get_color(int index) {
+    if (index == 0)
+        return mean_r;
+    else if (index == 1)
+        return mean_g;
+    else
+        return mean_b;
 
 }
+
+void load_png_pxl(Node *node) {
+    if (node->is_leaf()) return;
+    int vaild=0,sum_r=0,sum_g=0,sum_b=0;
+    for(int i=0;i<4;i++)
+    {
+        if(node->get_child(i)!=NULL)
+        {
+            vaild++;
+            load_png_pxl(node->get_child(i));
+            sum_r+=node->get_child(i)->get_color(0);
+            sum_g+=node->get_child(i)->get_color(1);
+            sum_b+=node->get_child(i)->get_color(2);
+        }
+    }
+    node->set_pxl(sum_r/vaild,sum_g/vaild,sum_b/vaild);
+}
+
+void Tree::load_png(PNG *png) {
+    Node *tmp = load_png_node(png, png->get_width(), png->get_height(), 0, 0);
+    root = tmp;
+    //int size = png->get_width() * png->get_height();
+    //int tile_width = png->get_width() / 2;
+    //int tile_height = png->get_height() / 2; 
+    // for (int j = 0; j < 4; j++) {
+    //     root->get_child(j) = load_png_node(png, png->get_width() / 2, png->get_height() / 2, tile_width * j, tile_height * j);
+    // }
+    create_children(root, png);
+    
+}
+
+
 
 Node *Tree::load_png_node(PNG *png, int width, int height, int x, int y) {
     if (width == 1 && height == 1) {
@@ -296,4 +347,16 @@ int *Node::get_mean() {
     mean[1] = mean_g;
     mean[2] = mean_b;
     return mean;
+}
+
+int Node::get_x() {
+    return x;
+}
+
+int Node::get_y() {
+    return y;
+}
+
+bool Node::is_leaf() {
+    return leaf;
 }

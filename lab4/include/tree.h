@@ -35,7 +35,12 @@ public:
     PNG *get_png();
     int get_width();
     int get_height();
+    int get_x();
+    int get_y();
     int *get_mean();
+    bool is_leaf();
+    void set_pxl(int r, int g, int b);
+    int get_color(int index);
     Node *&get_child(int i);
 };
 
