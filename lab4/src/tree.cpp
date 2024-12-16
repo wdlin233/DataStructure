@@ -219,7 +219,6 @@ int Tree::set_mean(Node *node, int r, int g, int b){
     }
     return 1;
 }
-
 int Tree::restore(Node *node){
     if(node==NULL)return -1;
     if(node->is_leaf()){
