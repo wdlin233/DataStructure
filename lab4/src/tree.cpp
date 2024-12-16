@@ -167,8 +167,8 @@ void Tree::pre_judege(Node *node, int threshold){
     int vaild=0;
     if(node->is_leaf())return;
     for(int i=0;i<4;i++){
-        if(node->children[i]!=NULL){
-            pre_judege(node->children[i],threshold);
+        if(node->get_child(i)!=NULL){
+            pre_judege(node->get_child(i),threshold);
             vaild++;
         }
     }
@@ -178,11 +178,11 @@ void Tree::pre_judege(Node *node, int threshold){
     //
     int sum_r=0,sum_g=0,sum_b=0;
     for(int i=0;i<4;i++){
-        if(node->children[i]!=NULL)
+        if(node->get_child(i)!=NULL)
         {
-            sum_r+=node->children[i]->get_rgb(0);
-            sum_g+=node->children[i]->get_rgb(1);
-            sum_b+=node->children[i]->get_rgb(2);
+            sum_r+=node->get_child(i)->get_rgb(0);
+            sum_g+=node->get_child(i)->get_rgb(1);
+            sum_b+=node->get_child(i)->get_rgb(2);
         }
     }
     //
@@ -193,8 +193,8 @@ void Tree::pre_judege(Node *node, int threshold){
     //
     int var_sum=0,var;
     for(int i=0;i<4;i++){
-        if(node->children[i]!=NULL){
-            Node *child=node->children[i];
+        if(node->get_child(i)!=NULL){
+            Node *child=node->get_child(i);
             var_sum+=(child->get_rgb(0)-mean_r)*(child->get_rgb(0)-mean_r)+(child->get_rgb(1)-mean_g)*(child->get_rgb(1)-mean_g)+(child->get_rgb(2)-mean_b)*(child->get_rgb(2)-mean_b);
         }
     }
@@ -215,9 +215,9 @@ int Tree::set_mean(Node *node, int r, int g, int b){
         return 0;
     }
     for(int i=0;i<4;i++){
-        if(node->children[i]!=NULL){
-            set_mean(node->children[i],r,g,b);
-            node->cut=(node->cut)>(node->children[i]->cut)?(node->cut):(node->children[i]->cut);
+        if(node->get_child(i)!=NULL){
+            set_mean(node->get_child(i),r,g,b);
+            node->cut=(node->cut)>(node->get_child(i)->cut)?(node->cut):(node->get_child(i)->cut);
 
         }
     }
@@ -232,8 +232,8 @@ int Tree::Set_all(Node *node){
         return 0;
     }
     for(int i=0;i<4;i++){
-        if(node->children[i]!=NULL){
-            Set_all(node->children[i]);
+        if(node->get_child(i)!=NULL){
+            Set_all(node->get_child(i));
         }
     }
     return 1;
@@ -247,8 +247,8 @@ int Tree::restore(Node *node){
         return 0;
     }
     for(int i=0;i<4;i++){
-        if(node->children[i]!=NULL){
-            restore(node->children[i]);
+        if(node->get_child(i)!=NULL){
+            restore(node->get_child(i));
         }
     }
     return 1;
@@ -259,8 +259,8 @@ int Tree::max_cut(Node *node){
     if(node->is_leaf())return node->cut;
     int ans=0;
     for(int i=0;i<4;i++){
-        if(node->children[i]!=NULL){
-            ans=ans>max_cut(node->children[i])?ans:max_cut(node->children[i]);
+        if(node->get_child(i)!=NULL){
+            ans=ans>max_cut(node->get_child(i))?ans:max_cut(node->get_child(i));
         }
     }
     return ans;
@@ -289,10 +289,10 @@ void Tree::build_tree(Node *node, PNG *png) {
             if (width[i] == 0 || height[i] == 0)
                 continue;
             else
-                current_node->children[i]=new Node(png,width[i],height[i],x[i],y[i]);
+                current_node->get_child(i)=new Node(png,width[i],height[i],x[i],y[i]);
 
             if (width[i] > 1 || height[i] > 1)
-                q.push(current_node->children[i]);
+                q.push(current_node->get_child(i));
         }
     }
 }
@@ -309,13 +309,13 @@ void Tree::set_node_color(Node *node){
     int vaild=0,sum_r=0,sum_g=0,sum_b=0;
     for(int i=0;i<4;i++)
     {
-        if(node->children[i]!=NULL)
+        if(node->get_child(i)!=NULL)
         {
             vaild++;
-            set_node_color(node->children[i]);
-            sum_r+=node->children[i]->get_rgb(0);
-            sum_g+=node->children[i]->get_rgb(1);
-            sum_b+=node->children[i]->get_rgb(2);
+            set_node_color(node->get_child(i));
+            sum_r+=node->get_child(i)->get_rgb(0);
+            sum_g+=node->get_child(i)->get_rgb(1);
+            sum_b+=node->get_child(i)->get_rgb(2);
         }
     }
     node->set_rgb(sum_r/vaild,sum_g/vaild,sum_b/vaild);
@@ -332,8 +332,8 @@ int& Node::get_rgb(int index) {
         return mean_alpha;
 }
 
-Node Node::get_child(int index) {
-    return *children[index];
+Node*& Node::get_child(int index) {
+    return children[index];
 }
 /*
  ================================================
