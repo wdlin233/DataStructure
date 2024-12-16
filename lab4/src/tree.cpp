@@ -1,4 +1,5 @@
 #include "tree.h"
+#include <queue>
 
 Node::Node() {
     p = nullptr; 
@@ -234,16 +235,35 @@ void load_png_pxl(Node *node) {
 }
 
 void Tree::load_png(PNG *png) {
-    Node *tmp = load_png_node(png, png->get_width(), png->get_height(), 0, 0);
+    Node *tmp = new Node(png, png->get_width(), png->get_height(), 0, 0);
     root = tmp;
-    //int size = png->get_width() * png->get_height();
-    //int tile_width = png->get_width() / 2;
-    //int tile_height = png->get_height() / 2; 
-    // for (int j = 0; j < 4; j++) {
-    //     root->get_child(j) = load_png_node(png, png->get_width() / 2, png->get_height() / 2, tile_width * j, tile_height * j);
-    // }
-    create_children(root, png);
-    
+    std::queue<Node*> q;
+    q.push(root);
+    //create_children(root, png);
+    while (!q.empty()) {
+        Node *node = q.front();
+        q.pop();
+        int width[4], height[4], x[4], y[4];
+        width[0] = width[2] = node->get_width() / 2;
+        width[1] = width[3] = node->get_width() - width[0];
+        height[0] = height[1] = node->get_height() / 2;
+        height[2] = height[3] = node->get_height() - height[0];
+        x[0] = x[2] = node->get_x();
+        x[1] = x[3] = node->get_x() + width[0];
+        y[0] = y[1] = node->get_y();
+        y[2] = y[3] = node->get_y() + height[0];
+
+        for (int i = 0; i < 4; i++) {
+            if (width[i]==1 && height[i] == 1)
+                node->get_child(i) = new Node(png, width[i], height[i], x[i], y[i]);
+            else if(width[i] == 0 || height[i] == 0)
+                continue;
+            else {
+                node->get_child(i) = new Node(png, width[i], height[i], x[i], y[i]);
+                q.push(node->get_child(i));
+            }
+        }
+    }
 }
 
 
