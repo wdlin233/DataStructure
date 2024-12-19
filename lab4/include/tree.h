@@ -28,18 +28,20 @@ public:
     int r_b;
     int judged_times;
     Node*& get_child(int index);
-    int get_width();
-    int get_heigth();
-    int get_x();
-    int get_y();
+    int& get_width();
+    int& get_height();
+    int& get_x();
+    int& get_y();
+    bool& get_leaf();
     bool is_leaf();
     int& get_rgb(int index);
     void set_rgb(int r,int g,int b);
+    PNG*& get_p();
     Node();
     Node(PNG* corner, int input_width, int input_height, int x, int y);
-    Node(const Node &other);
+    Node(Node &other);
     Node(Node &&other);
-    Node& operator=(const Node &other);
+    Node& operator=(Node &other);
     Node& operator=(Node &&other);
     ~Node();
     void print();
@@ -65,5 +67,6 @@ public:
     int max_judged_times(Node *node);
     int set_mean(Node *node, int r, int g, int b);
     int restore(Node *node);
+    pxl* get_pxl();
 };
 #endif
