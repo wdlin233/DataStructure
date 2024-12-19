@@ -28,7 +28,7 @@ int read_from_file(FILE* input_file, Dict *dict) {
     char *str=new char[20];
     int n = 0;
     char ch;
-    while((c = fgetc(input_file)) != EOF)
+    while((ch = fgetc(input_file)) != EOF)
     {
         if(isalpha(ch)) {
             str[n++] = tolower(ch);

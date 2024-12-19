@@ -1,5 +1,9 @@
 #include "hashtable.h"
 
+Node::~Node() {
+    // do nothing
+}
+
 bool Node::operator!=(const char *str) {
     if(str==NULL)
         return true;
@@ -63,8 +67,8 @@ const pair<string, int>* Node::get_pair() const {
 }
 
 HashTable::HashTable() {
-    elem=new Node[100000];
-    size=100000;
+    elem=new Node[300000]();
+    size=300000;
 }
 
 HashTable::~HashTable() {
@@ -112,19 +116,44 @@ int HashTable::insert(Node &index) {
     return 1;
 }
 
+// or you can use this:
+// int HashTable::insert(const char * str) {
+//     //Node *tmp=new Node(str);
+//     Node tmp(str);
+//     int pos = 0, times = 0;
+//     if(search(tmp,pos,times))
+//     {
+//         elem[pos].second()++;
+//         return 2;
+//     }
+//     else
+//         elem[pos]=tmp;
+//     //delete tmp;
+//     return 1;
+// }
+
 int HashTable::insert(const char * str) {
     Node *tmp=new Node(str);
+    //Node tmp(str);
     int pos = 0, times = 0;
     if(search(*tmp,pos,times))
     {
         elem[pos].second()++;
+        delete tmp; // which is important
         return 2;
+    } else {
+        elem[pos] = *tmp;
+        delete tmp;
     }
-    else
-        elem[pos]=*tmp;
-    delete tmp;
     return 1;
 }
+
+// another way to implement insert
+// int HashTable::insert(const char *str) {
+//     Node tmp(str);
+//     int result = insert(tmp);
+//     return result;
+// }
 
 /*
  ==========================================================================
