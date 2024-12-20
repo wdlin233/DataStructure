@@ -288,19 +288,27 @@ PNG*& Node::get_p(){
 }
 
 void Tree::load_png(PNG *png) {
-    // Node *tmp=new Node(png,png->get_width(),png->get_height(),0,0);
-    // root=tmp;
     
-    //*root = Node(png, png->get_width(), png->get_height(), 0, 0);
     
+    // version 1
     root->get_p() = png;
     root->get_height() = png->get_height();
     root->get_width() = png->get_width();
     root->get_leaf() = false;
     root->get_x() = 0;
     root->get_y() = 0;
+
+    // version 2
+    // Node *tmp=new Node(png,png->get_width(),png->get_height(),0,0);
+    // root=tmp;
+    // point to the same memory
+
     build_tree(root, png);
     set_node_average_color(root);
+    // here don't need to delete tmp, because root take the ownership of tmp
+    // root will be released in the destructor of Tree
+    // 因为 root 现在指向 tmp 所指向的内存，并且 root 将负责管理这块内存的生命周期。
+    // if I `delete tmp` here, root will point to a released memory, which will cause a segmentation fault. 
 }
 
 void Tree::set_node_average_color(Node *node){
@@ -374,7 +382,10 @@ pxl* Node::get_pxl() {
 }
 
 Tree::Tree() {
+    // version 1
     root = new Node();
+    // version 2
+    //root = nullptr;
 }
 
 Tree::~Tree() {
