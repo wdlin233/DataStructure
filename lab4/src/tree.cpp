@@ -2,115 +2,131 @@
 #include <queue>
 
 Node::Node() {
-    //初始化孩子节点
-    children = new Node * [4];
-    for (int i = 0;i < 4;i++) {
-        children[i] = NULL;
+    p=NULL;
+    children = new Node*[4];
+    for(int i=0;i<4;i++)
+    {
+        *(children+i)=NULL;
     }
-    p = NULL;//the upper left pixel
-    width = 0;//当前像素区块的宽度
-    height = 0;//当前像素区块的高度
-    leaf = false;//是否是叶子节点，true 代表是叶子节点
-    x = 0;//当前像素区块左上角顶点像素的横坐标
-    y = 0;//当前像素区块左上角顶点像素的纵坐标
-    mean_r = 0;//Rmean
-    mean_g = 0; //Gmean
-    mean_b = 0;//Bmean
-    r_r = 0;
-    r_g = 0;
-    r_b = 0;
-    judged_times = 0;
+    width=0;
+    height=0;
+    leaf=false;
+    x=0;
+    y=0;
+    mean_b=0;
+    mean_g=0;
+    mean_r=0;
+    judged_times=0;
+
 }
-//带参数的构造函数
+
 Node::Node(PNG* corner, int input_width, int input_height, int x, int y) {
-    children = new Node * [4];
-    for (int i = 0;i < 4;i++) {
-        children[i] = NULL;
-    }
-    p = corner;
-    width = input_width;
-    height = input_height;
-    this->x = x;
-    this->y = y;
-    leaf = (input_width == 1 && input_height == 1);//构建时默认是子节点
-    mean_r = get_pxl()->red;
-    mean_g = get_pxl()->green;
-    mean_b = get_pxl()->blue;
-    this->r_r = this->mean_r;
-    this->r_g = this->mean_g;
-    this->r_b = this->mean_b;
-    judged_times = 0;
+    p=corner;
+    children = new Node*[4];
+    for(int i=0;i<4;i++)
+    {
+        *(children+i)=NULL;
+    }   
+    width=input_width;
+    height=input_height;
+    if(input_width==1 && input_height==1)
+        leaf=true;
+    else
+        leaf=false;
+    this->x=x;
+    this->y=y;
+    mean_r=get_pxl()->red;
+    mean_g=get_pxl()->green;
+    mean_b=get_pxl()->blue;
+    r_r=mean_r;
+    r_g=mean_g;
+    r_b=mean_b;
+    judged_times=0;
+
 }
-// 拷贝构造函数
-Node::Node(Node& other) { 
-    children = new Node * [4];
-    for (int i = 0;i < 4;i++) {
-        children[i] = other.children[i];
+
+Node::Node(Node &other) {
+    p = new PNG(*other.p); // Deep copy of PNG object
+    children = new Node*[4];
+    for (int i = 0; i < 4; ++i) {
+        children[i] = other.children[i] ? new Node(*other.children[i]) : nullptr; // Deep copy of children
     }
-    *p = *other.p;
     width = other.width;
     height = other.height;
+    leaf = other.leaf;
     x = other.x;
     y = other.y;
-    leaf = other.leaf;
     mean_r = other.mean_r;
     mean_g = other.mean_g;
     mean_b = other.mean_b;
-    judged_times = other.judged_times;
 }
-// 右值拷贝构造函数，最后保留一份
-Node::Node(Node&& other) { 
-    p = other.p;
-    children = other.children;
-    width = other.width;
-    height = other.height;
-    x = other.x;
-    y = other.y;
-    leaf = other.leaf;
-    mean_r = other.mean_r;
-    mean_g = other.mean_g;
-    mean_b = other.mean_b;
-    judged_times = other.judged_times;
-    other.p = NULL;
-    other.children = NULL;
+
+Node::Node(Node &&other) {
+    p=other.p;
+    children=other.children;
+    width=other.width;
+    height=other.height;
+    leaf=other.leaf;
+    this->x=other.x;
+    this->y=other.y;
+    mean_r=other.mean_r;
+    mean_g=other.mean_g;
+    mean_b=other.mean_b;
+    r_r=mean_r;
+    r_g=mean_g;
+    r_b=mean_b;
+    judged_times=other.judged_times;
+    other.p=nullptr;
+    other.children=nullptr;
 }
-//重载node 的赋值操作符
-Node& Node::operator=(Node& other) {
-    for (int i = 0;i < 4;i++) {
-        children[i] = other.children[i];
+
+Node& Node::operator=(Node &other) {
+    if (this != &other) {
+        delete p;
+        for (int i = 0; i < 4; ++i) {
+            delete children[i];
+        }
+        delete[] children;
+
+        p = new PNG(*other.p); // Deep copy of PNG object
+        children = new Node*[4];
+        for (int i = 0; i < 4; ++i) {
+            children[i] = other.children[i] ? new Node(*other.children[i]) : nullptr; // Deep copy of children
+        }
+        width = other.width;
+        height = other.height;
+        leaf = other.leaf;
+        x = other.x;
+        y = other.y;
+        mean_r = other.mean_r;
+        mean_g = other.mean_g;
+        mean_b = other.mean_b;
     }
-    if (this == &other) return *this;
-        p = other.p;
-    width = other.width;
-    height = other.height;
-    x = other.x;
-    y = other.y;
-    leaf = other.leaf;
-    mean_r = other.mean_r;
-    mean_g = other.mean_g;
-    mean_b = other.mean_b;
-    judged_times = other.judged_times;
     return *this;
 }
-//重载右值等号赋值操作符
-Node& Node::operator=(Node&& other) {
-    if (this == &other) return *this;
-    if (this->children != NULL) delete children;
-    if (this->p != NULL) delete p;
-    p = other.p;
-    children = other.children;
-    width = other.width;
-    height = other.height;
-    x = other.x;
-    y = other.y;
-    leaf = other.leaf;
-    mean_r = other.mean_r;
-    mean_g = other.mean_g;
-    mean_b = other.mean_b;
-    judged_times = other.judged_times;
-    other.p = NULL;
-    other.children = NULL;
+
+Node& Node::operator=(Node &&other) {
+    if(this==&other)return *this;
+    if(p!=NULL) delete p;
+    if(children!=NULL) delete[] p;
+    p=other.p;
+    children=other.children;
+    width=other.width;
+    height=other.height;
+    leaf=other.leaf;
+    this->x=other.x;
+    this->y=other.y;
+    mean_r=other.mean_r;
+    mean_g=other.mean_g;
+    mean_b=other.mean_b;
+    r_r=mean_r;
+    r_g=mean_g;
+    r_b=mean_b;
+    judged_times=other.judged_times;
+    other.p=nullptr;
+    other.children=nullptr;
     return *this;
+
 }
 int& Node::get_height(){
     return height;
@@ -378,9 +394,6 @@ Tree& Tree::operator=(Tree& other) {
     return *this;
 }
 
-pxl* Tree::get_pxl() {
-    return root->get_pxl();
-}
 
 void Tree::print() {
     root->print();

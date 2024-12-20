@@ -67,6 +67,5 @@ public:
     int max_judged_times(Node *node);
     int set_mean(Node *node, int r, int g, int b);
     int restore(Node *node);
-    pxl* get_pxl();
 };
 #endif
