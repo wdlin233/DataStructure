@@ -94,24 +94,43 @@ Stack<T>::~Stack() {
 template <class T>
 T *Stack<T>::top() {
     // TODO
+    if (top_ != NULL) {
+        return top_->ptr();
+    }
     return NULL;
 }
 
 template <class T>
 void Stack<T>::push(T *t) {
     // TODO
+    if (t == NULL) return;
+    Node<T> *tmp = new Node<T>(t);
+    if (length > 0) tmp->set_next(top_);
+    top_ = tmp;
+    length += 1;
     return;
 }
 
 template <class T>
 void Stack<T>::push(Node<T> *n) {
     // TODO
+    if (n == NULL) return;
+    Node<T> *tmp = new Node<T>(*n);
+    if (length > 0) tmp->set_next(top_);
+    top_ = tmp;
+    length += 1;
     return;
 }
 
 template <class T>
 Node<T> *Stack<T>::pop() {
     // TODO
+    if (length > 0) {
+        Node<T> *tmp = top_;
+        length -= 1;
+        top_ = top_->get_next();
+        return tmp;
+    }
     return NULL;
 }
 

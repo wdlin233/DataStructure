@@ -13,9 +13,10 @@ public:
     Node *get_next() const;
     void set_next(Node *n);
     void print();
+    T *ptr;
 private:
     Node *next;
-    T *ptr;
+    
 };
 
 template <class T>
