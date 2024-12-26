@@ -56,43 +56,43 @@ void Heap::heapify_up() {
 }
 
 void Heap::heapify_down() {
-    int index = 0;
+    int index = 0, smallest;
     while (true) {
         int left_child = get_child(LEFT, index);
         int right_child = get_child(RIGHT, index);
-        int smallest = index;
+        // int smallest = index;
 
-        if (left_child != -1 && arr[left_child] < arr[smallest]) {
-            smallest = left_child;
-        }
-        if (right_child != -1 && arr[right_child] < arr[smallest]) {
-            smallest = right_child;
-        }
-        
-        if (smallest != index) {
-            swap(arr[index], arr[smallest]);
-            index = smallest;
-        } else {
-            break;
-        }
-        // if ((left_child >= 0 && left_child <num) && (right_child >= 0 && right_child < num)) {
-        //     smallest = (arr[left_child] < arr[right_child]) ? left_child : right_child;
-        // }
-        // else if (left_child >= 0 && left_child < num) {
+        // if (left_child != -1 && arr[left_child] < arr[smallest]) {
         //     smallest = left_child;
         // }
-        // else {
+        // if (right_child != -1 && arr[right_child] < arr[smallest]) {
         //     smallest = right_child;
         // }
-
-        // if (smallest >= 0 && smallest < num) {
-        //     if (arr[index] > arr[smallest]) {
-        //         swap(arr[index], arr[smallest]);
-        //         index = smallest;
-        //         continue;
-        //     }
+        
+        // if (smallest != index) {
+        //     swap(arr[index], arr[smallest]);
+        //     index = smallest;
+        // } else {
+        //     break;
         // }
-        // return;
+        if ((left_child >= 0 && left_child <num) && (right_child >= 0 && right_child < num)) {
+            smallest = (arr[left_child] < arr[right_child]) ? left_child : right_child;
+        }
+        else if (left_child >= 0 && left_child < num) {
+            smallest = left_child;
+        }
+        else {
+            smallest = right_child;
+        }
+
+        if (smallest >= 0 && smallest < num) {
+            if (arr[index] > arr[smallest]) {
+                swap(arr[index], arr[smallest]);
+                index = smallest;
+                continue;
+            }
+        }
+        return;
     }
 }
 
@@ -136,16 +136,14 @@ int Heap::insert(Player_info &p) {
 
 Player_info *Heap::sort() {
     //TODO
-    int n = num;
     Player_info *vec = new Player_info[2000];
-    for (int i = 0; i < num; i++) {
-        num--;
-        if (num <= 0)
-            break;
+    // where is medium test error happened.
+    int num_for_passing_medium_test = num;
+    for (num = num - 1;num > 0; num--) {
         swap(arr[0], arr[num]);
         heapify_down();
     }
-    num = n;
+    int num = num_for_passing_medium_test;
     for (int i = 0; i < 2000; i++) {
         vec[i] = arr[i];
     }

@@ -28,23 +28,26 @@ int Workflow::insert(Job *j) {
 		tail = j;
 		
 	}
-	Job *tmp = tail;
+	Job *tmp_job = tail;
 	tail->next = j;
 	size += 1;
 	tail = j;
-	tail->prev = tmp;
+	tail->prev = tmp_job;
     return 0;
 }
 
 int Workflow::swap(int original_index, int target_index) {
 	if(original_index>=size || target_index>=size || original_index<0 || target_index<0)return 1;
-	if(original_index==target_index)return 1;
+	if(original_index==target_index)
+		return 1;
+
 	Job *tmp1, *tmp2, *tp;
 	bool flag1, flag2;
 	tmp1 = head;
 	flag1 = false;
 	tmp2 = head;
 	flag2 = false;
+	
 	for (int i = 0; i < size; i++)
 	{
 		if (i != original_index && flag1==false)
@@ -74,13 +77,14 @@ int Workflow::swap(int original_index, int target_index) {
 		}
 		tp = tp->next;
 	}
-	Job *t1, *t2;
-	t1 = tmp1->prev;
-	t2 = tmp1->next;
+	
+	Job *tmp_job1, *tmp_job2;
+	tmp_job1 = tmp1->prev;
+	tmp_job2 = tmp1->next;
 	tmp1->prev = tmp2->prev;
 	tmp1->next = tmp2->next;
-	tmp2->prev = t1;
-	tmp2->next = t2;
+	tmp2->prev = tmp_job1;
+	tmp2->next = tmp_job2;
     return 0;
 }
 
@@ -95,16 +99,16 @@ int Workflow::process(vector *l, int index) {
 	if(index>=0 && index<size){
 		if(l==nullptr)return 1;
 		if(l->get(0)==nullptr)return 1;
-		Job *tmp=head;
+		Job *tmp_job=head;
 		for (int i = 0; i < size; i++)
 		{
 			if (i == index)
 			{
-				tmp->worker = l->get(0);
+				tmp_job->worker = l->get(0);
 				l->remove(0);
 			}
-			tmp = tmp->next;
-			if(tmp==nullptr)return 1;
+			tmp_job = tmp_job->next;
+			if(tmp_job==nullptr)return 1;
 		}
 			return 0;
 		}

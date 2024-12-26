@@ -4,14 +4,6 @@
 #include <iostream>
 #include <cstdlib>
 
-/*提示：这里的 data 是一个指向指针的指针。
- 在操作指针前请三思！
- 如果你不知道的话：malloc 的功能和 new 类似，
- 这里使用 malloc 是为了方便空间不足时进行扩展。
- 不用担心，扩展函数已为你写好。
- －－前一位实习生
- */
-
 int vector::insert(Worker *new_worker) {
     if(size==length)
     {
@@ -41,13 +33,13 @@ Worker *vector::get(int index) {
 Worker *vector::remove(int index) {
 	if (index >= 0 && index < length)
 	{
-		Worker *tmp = *(data + index);
+		Worker *tmp_worker = *(data + index);
 		for (int i = index; i < length-1; i++)
 		{
 			*(data + i) = *(data + i + 1);
 		}
 		length -= 1;
-		return tmp;
+		return tmp_worker;
 	}
 	else
 		return nullptr;
