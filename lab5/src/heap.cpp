@@ -10,6 +10,13 @@ void swap(Player_info &a, Player_info &b) {
     b = temp;
 }
 
+// #define swap(x, y) \
+//     do { \
+//         Player_info tmp = x; \
+//         x = y; \
+//         y = tmp; \
+//     }while(0) \
+
 Heap::~Heap() {
     //TODO
     delete[] arr;
@@ -68,6 +75,24 @@ void Heap::heapify_down() {
         } else {
             break;
         }
+        // if ((left_child >= 0 && left_child <num) && (right_child >= 0 && right_child < num)) {
+        //     smallest = (arr[left_child] < arr[right_child]) ? left_child : right_child;
+        // }
+        // else if (left_child >= 0 && left_child < num) {
+        //     smallest = left_child;
+        // }
+        // else {
+        //     smallest = right_child;
+        // }
+
+        // if (smallest >= 0 && smallest < num) {
+        //     if (arr[index] > arr[smallest]) {
+        //         swap(arr[index], arr[smallest]);
+        //         index = smallest;
+        //         continue;
+        //     }
+        // }
+        // return;
     }
 }
 
