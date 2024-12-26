@@ -9,6 +9,11 @@
 class State {
 private:
     //TODO
+    int picture[2000][2000];
+    bool vis[2000][2000];
+    int dis[2000][2000];
+    int row;
+    int column; 
 public:
     State();
     State(State &other);
