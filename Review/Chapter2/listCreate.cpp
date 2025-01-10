@@ -1,3 +1,9 @@
+/*
+    malloc example:
+    double * ptd;
+    ptd = (double * ) malloc (30 * sizeof(double));
+*/
+
 typedef int datatype;
 typedef struct node {
     datatype data;
@@ -31,4 +37,39 @@ void createListTail(ListNodePtr &L, datatype arr[], int n) {
     }
 }
 
-//前插
+// 前插
+// T(n) = O(n)
+void insertList(ListNodePtr &L, datatype x, int i) {
+    ListNodePtr p = L;
+    for (int j = 0; j < i - 1; j++) {
+        p = p->next;
+    } // 找到第i个节点
+    ListNodePtr s = (ListNodePtr)malloc(sizeof(ListNode));
+    s->data = x;
+    s->next = p->next;
+    p->next = s;
+}
+
+void splitList(ListNodePtr &L, ListNodePtr &L1, ListNodePtr &L2) {
+    ListNodePtr curr = L->next, next_node = nullptr;
+    L1 = L;
+    ListNodePtr r1 = L1; // L1尾指针
+    L2 = (ListNodePtr)malloc(sizeof(ListNode));
+    L2->next = nullptr;
+    // 对L1尾插，L2头插
+    while (curr != nullptr) {
+        r1->next = curr;
+        r1 = curr;
+        //r1->next = nullptr; 之后置空，否则无法取了
+        // 更新尾指针
+        curr = curr->next;
+        next_node = curr->next;
+        // 创建临时节点
+        curr->next = L2->next;
+        L2->next = curr;
+        // 头插
+        curr = next_node;
+    }
+    r1->next = nullptr;
+}
+
