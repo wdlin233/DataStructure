@@ -13,5 +13,5 @@ void reverseList(ListNodePtr &L) {
         curr = curr->next;
         prev->next = L->next;
         L->next = prev;
-    }
+    } // 将各元素依次头插
 }
