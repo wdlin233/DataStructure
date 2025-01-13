@@ -13,8 +13,10 @@ struct edge {
 std::vector<edge> adj[MAXN];  // 邻接表表示图
 int dis[MAXN];                // 最短路径数组
 
+// O(mlogm)
 void dijkstra(int start, int n) {
     // std::priority_queue<T, Container, Compare>
+    // 小根堆
     std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<>> pq;
 
     std::fill(dis, dis + n + 1, INF);  // 初始化距离为无穷大
