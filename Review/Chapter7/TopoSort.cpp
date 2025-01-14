@@ -6,6 +6,7 @@ using namespace std;
 
 // AOV
 // 拓扑排序函数
+// O(V+E)
 vector<int> topologicalSort(int n, vector<vector<int>>& adj) {
     vector<int> inDegree(n, 0);  // 存储每个节点的入度
     vector<int> result;          // 存储拓扑排序的结果

@@ -3,6 +3,7 @@ typedef struct Stack {
     int data[MAXASIZE];
     int top;
 } Stack, *StackPtr;
+// O(1)
 
 void initStack(StackPtr &S) {
     S->top = -1; // 置栈空

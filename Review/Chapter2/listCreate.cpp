@@ -9,6 +9,7 @@ typedef struct node {
     datatype data;
     struct node *next;
 } ListNode, *ListNodePtr;
+// O(n)
 
 // 头插法创建链表
 void createListHead(ListNodePtr &L, datatype arr[], int n) {
